@@ -17,4 +17,4 @@ RUN mkdir -p /app/registration/staticfiles
 # Сборка статики
 # RUN python /app/registration/manage.py collectstatic --noinput
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "registration.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app/registration.wsgi:application"]
