@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #registrationForm input {
+            background-color: #f5f5f5;
+            margin-bottom: 10px;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: flex;
+        }
+        .progress-container {
+            height: 1px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        #progressBar {
+            height: 100%;
+            background-color: blue;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .form-container {
+            padding: 2rem;
+            position: relative;
+        }
+        .img-container {
+            position: relative;
+            height: 100%;
+        }
+        .img-container img {
+            position: absolute;
+            top: 70px;
+            left: 40px;
+            width: 80%;
+            height: auto;
+            object-fit: contain;
+        }
+        .agreement-text {
+            font-size: 0.9rem;
+            margin: 15px 0;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.5s ease, max-height 0.5s ease;
+        }
+        .agreement-text.show {
+            opacity: 1;
+            max-height: 200px;
+        }
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .error {
+            color: red;
+            font-size: 0.8rem;
+            margin-top: -8px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .input-container {
+            position: relative;
+            width: 100%;
+        }
+        .error-icon {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: red;
+            display: none;
+        }
+        .valid-icon {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: green;
+            display: none;
+        }
+        .field-error {
+            border: 1px solid red !important;
+        }
+        .btn-disabled {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            cursor: not-allowed !important;
+            opacity: 0.65;
+        }
+        .file-upload {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .file-upload-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            cursor: pointer;
+        }
+        .file-upload-label:hover {
+            background-color: #e9ecef;
+        }
+        .file-name {
+            margin-left: 10px;
+            font-size: 0.9rem;
+            color: #495057;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-grow: 1;
+        }
+        .file-icon {
+            color: #6c757d;
+        }
+        #custom_team {
+            transition: all 0.3s ease;
+        }
+        .combobox-container {
+            position: relative;
+        }
+        .btn-primary.btn-disabled{
+                background-color: #6c757d !important;
+                border-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.65;
+
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center bg-light">
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
+        <div class="container shadow bg-white" style="max-width: 1200px; padding: 0;">
+            <div class="row g-0">
+                <!-- Левая часть - форма -->
+                <div class="col-lg-6 form-container">
+                    <div class="form-wrapper">
+                        <form method="post" id="registrationForm" action="root" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <h2 class="my-4 fade-in" id="formTitle">Регистрация</h2>
+
+                            <!-- Шаг 1: Основная информация -->
+                            <div class="step active align-items-center justify-content-center" id="step1">
+                                <div style="display: flex; flex-direction: column;" class="align-items-center justify-content-center w-100">
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Фамилия" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="lastNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="lastNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="lastNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Имя" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="firstNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="firstNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="firstNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="middle_name" name="middle_name" placeholder="Отчество">
+                                        <i class="fas fa-exclamation-circle error-icon" id="middleNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="middleNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="middleNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Адрес электронной почты" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="emailErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="emailValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="emailError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="school_name" name="school_name" placeholder="Название школы" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="schoolNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="schoolNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="schoolNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Номер телефона (+7 XXX XXX XX XX)" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="phoneErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="phoneValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="phoneError"></div>
+
+                                    <button type="button" class="btn btn-primary btn-disabled" id="step1Btn" onclick="validateStep1()" style="width: 150px; margin-top:20px;" disabled>Продолжить</button>
+                                </div>
+                            </div>
+
+                            <!-- Шаг 2: Информация о наставнике, команде и документ -->
+                            <div class="step align-items-center justify-content-center" id="step2">
+                                <div style="display: flex; flex-direction: column;" class="align-items-center justify-content-center w-100">
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="mentor_last_name" name="mentor_last_name" placeholder="Фамилия наставника" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="mentorLastNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="mentorLastNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="mentorLastNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="mentor_first_name" name="mentor_first_name" placeholder="Имя наставника" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="mentorFirstNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="mentorFirstNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="mentorFirstNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="mentor_middle_name" name="mentor_middle_name" placeholder="Отчество наставника">
+                                        <i class="fas fa-exclamation-circle error-icon" id="mentorMiddleNameErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="mentorMiddleNameValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="mentorMiddleNameError"></div>
+
+                                    <div class="input-container">
+                                        <input type="text" class="form-control" id="mentor_position" name="mentor_position" placeholder="Должность наставника" required>
+                                        <i class="fas fa-exclamation-circle error-icon" id="mentorPositionErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="mentorPositionValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="mentorPositionError"></div>
+
+                                    <!-- Поле для команды -->
+                                    <div class="input-container">
+                                        <select class="form-control" id="team" name="team">
+                                            <option value="">Выберите команду или введите новую</option>
+                                            <option value="Команда Альфа">Команда Альфа</option>
+                                            <option value="Команда Бета">Команда Бета</option>
+                                            <option value="Команда Гамма">Команда Гамма</option>
+                                            <option value="custom">Другая команда</option>
+                                        </select>
+                                        <input type="text" class="form-control mt-2" id="custom_team" name="custom_team" placeholder="Введите название команды" style="display: none;">
+                                        <i class="fas fa-exclamation-circle error-icon" id="teamErrorIcon"></i>
+                                        <i class="fas fa-check-circle valid-icon" id="teamValidIcon"></i>
+                                    </div>
+                                    <div class="error" id="teamError"></div>
+
+                                    <!-- Поле загрузки файла (перенесено на второй шаг) -->
+                                    <div class="file-upload input-container" style="margin-top: 10px;">
+                                        <label class="file-upload-label" for="document">
+                                            <span class="file-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                                            <span class="file-name" id="fileName">Загрузите документ (PDF, DOC, DOCX, JPG, PNG)</span>
+                                            <span class="file-icon"><i class="fas fa-file-alt"></i></span>
+                                        </label>
+                                        <input type="file" class="file-upload-input" id="document" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                        <div class="error" id="documentError" style="margin-top: 5px;"></div>
+                                    </div>
+
+                                    <div class="row w-100" style="margin-top:20px;">
+                                        <button type="button" class="btn btn-secondary col-3" onclick="prevStep(1)">Назад</button>
+                                        <button type="submit" class="btn btn-primary btn-disabled col-8 ms-auto" id="submitBtn" onclick="return validateForm()" disabled>Создать аккаунт</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="agreement-text" id="agreementSection" style="color:gray; margin-top:40px;">
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="newsCheck">
+                                <label class="form-check-label" for="newsCheck">
+                                    Соглашаюсь на обработку персональных данных
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    Соглашаюсь с условиями <a href="#">Пользовательского соглашения</a>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-center text-muted small pb-3" style="margin-top:40px;">
+                            <hr>
+                            Репин НАШ!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая часть - изображение -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="img-container">
+                        <img src="{% static 'img/Ресурс 1.svg' %}" alt="Фоновое изображение" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        const totalSteps = 2;
+
+        // Объект для отслеживания, было ли взаимодействие с полем
+        const fieldInteracted = {
+            last_name: false,
+            first_name: false,
+            middle_name: false,
+            email: false,
+            school_name: false,
+            phone: false,
+            document: false,
+            mentor_last_name: false,
+            mentor_first_name: false,
+            mentor_middle_name: false,
+            mentor_position: false,
+            team: false
+        };
+
+        // Обработчик для загрузки файла (теперь на втором шаге)
+        document.getElementById('document').addEventListener('change', function(e) {
+            fieldInteracted.document = true;
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Загрузите документ (PDF, DOC, DOCX, JPG, PNG)';
+            document.getElementById('fileName').textContent = fileName;
+            validateDocument();
+            updateButtonState();
+        });
+
+        // Обработчик для поля команды
+        document.getElementById('team').addEventListener('change', function() {
+            const customTeamInput = document.getElementById('custom_team');
+            fieldInteracted.team = true;
+
+            if (this.value === 'custom') {
+                customTeamInput.style.display = 'block';
+                customTeamInput.focus();
+            } else {
+                customTeamInput.style.display = 'none';
+                customTeamInput.value = '';
+            }
+
+            validateTeam();
+            updateButtonState();
+        });
+
+        // Обработчик для отправки формы
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const teamSelect = document.getElementById('team');
+            const customTeam = document.getElementById('custom_team');
+
+            if (teamSelect.value === 'custom') {
+                teamSelect.name = 'team';
+                teamSelect.value = customTeam.value;
+                customTeam.name = '';
+            } else {
+                customTeam.name = '';
+            }
+
+            if (!validateForm()) {
+                return false;
+            }
+
+            const formData = new FormData(this);
+
+            fetch('/api/register/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data.message);
+                } else {
+                    showErrors(data.errors);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз.');
+            });
+        });
+
+        function showSuccess(message) {
+            alert(message);
+            // Здесь можно добавить перенаправление или другие действия после успешной регистрации
+            // window.location.href = '/success/';
+        }
+
+        function showErrors(errors) {
+            // Очищаем все предыдущие ошибки
+            document.querySelectorAll('.error').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.error-icon').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.valid-icon').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.field-error').forEach(el => {
+                el.classList.remove('field-error');
+            });
+
+            // Показываем новые ошибки
+            for (const field in errors) {
+                const errorElement = document.getElementById(`${field}Error`);
+                const errorIcon = document.getElementById(`${field}ErrorIcon`);
+                const validIcon = document.getElementById(`${field}ValidIcon`);
+                const inputElement = document.getElementById(field);
+
+                if (errorElement && errorIcon && inputElement) {
+                    errorElement.textContent = errors[field].join(', ');
+                    errorElement.style.display = 'block';
+                    errorIcon.style.display = 'block';
+                    validIcon.style.display = 'none';
+                    inputElement.classList.add('field-error');
+                }
+            }
+        }
+
+        // Функция для добавления обработчиков событий
+        function setupFieldValidation(fieldId, validationFn) {
+            const field = document.getElementById(fieldId);
+
+            field.addEventListener('input', function() {
+                fieldInteracted[fieldId] = true;
+                validationFn();
+                updateButtonState();
+            });
+
+            field.addEventListener('blur', function() {
+                if (field.value.trim() !== '') {
+                    fieldInteracted[fieldId] = true;
+                }
+                validationFn();
+                updateButtonState();
+            });
+        }
+
+        // Настройка валидации для всех полей
+        setupFieldValidation('last_name', validateLastName);
+        setupFieldValidation('first_name', validateFirstName);
+        setupFieldValidation('middle_name', validateMiddleName);
+        setupFieldValidation('email', validateEmail);
+        setupFieldValidation('school_name', validateSchoolName);
+        setupFieldValidation('phone', validatePhone);
+        setupFieldValidation('mentor_last_name', validateMentorLastName);
+        setupFieldValidation('mentor_first_name', validateMentorFirstName);
+        setupFieldValidation('mentor_middle_name', validateMentorMiddleName);
+        setupFieldValidation('mentor_position', validateMentorPosition);
+        setupFieldValidation('team', validateTeam);
+
+        // Обработчик для чекбокса
+        document.getElementById('termsCheck').addEventListener('change', function() {
+            updateButtonState();
+        });
+
+        // Функция валидации документа
+        function validateDocument() {
+            const fileInput = document.getElementById('document');
+            const errorElement = document.getElementById('documentError');
+            const allowedExtensions = /(\.pdf|\.doc|\.docx|\.jpg|\.jpeg|\.png)$/i;
+
+            if (!fieldInteracted.document) {
+                errorElement.style.display = 'none';
+                return false;
+            }
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                errorElement.textContent = 'Пожалуйста, загрузите документ';
+                errorElement.style.display = 'block';
+                return false;
+            }
+
+            const file = fileInput.files[0];
+            const fileSize = file.size / 1024 / 1024; // Размер в MB
+            const fileName = file.name;
+
+            if (!allowedExtensions.exec(fileName)) {
+                errorElement.textContent = 'Допустимые форматы: PDF, DOC, DOCX, JPG, PNG';
+                errorElement.style.display = 'block';
+                return false;
+            }
+
+            if (fileSize > 5) {
+                errorElement.textContent = 'Размер файла не должен превышать 5MB';
+                errorElement.style.display = 'block';
+                return false;
+            }
+
+            errorElement.style.display = 'none';
+            return true;
+        }
+
+        // Функция валидации команды
+        function validateTeam() {
+            const teamSelect = document.getElementById('team').value;
+            const customTeam = document.getElementById('custom_team').value;
+            const errorElement = document.getElementById('teamError');
+            const errorIcon = document.getElementById('teamErrorIcon');
+            const validIcon = document.getElementById('teamValidIcon');
+
+            if (!fieldInteracted.team) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!teamSelect) {
+                showError(errorElement, errorIcon, validIcon, 'Выберите команду или введите новую');
+                return false;
+            }
+
+            if (teamSelect === 'custom' && !customTeam.trim()) {
+                showError(errorElement, errorIcon, validIcon, 'Введите название своей команды');
+                return false;
+            }
+
+            if (teamSelect === 'custom' && customTeam.length < 2) {
+                showError(errorElement, errorIcon, validIcon, 'Название команды должно содержать не менее 2 символов');
+                return false;
+            }
+
+            if (teamSelect === 'custom' && !/^[а-яА-ЯёЁ0-9\s\-]+$/.test(customTeam)) {
+                showError(errorElement, errorIcon, validIcon, 'Название команды может содержать только русские буквы, цифры, пробелы и дефис');
+                return false;
+            }
+
+            showSuccess(errorElement, errorIcon, validIcon);
+            return true;
+        }
+
+        function validateLastName() {
+            const lastName = document.getElementById('last_name').value;
+            const errorElement = document.getElementById('lastNameError');
+            const errorIcon = document.getElementById('lastNameErrorIcon');
+            const validIcon = document.getElementById('lastNameValidIcon');
+
+            if (!fieldInteracted.last_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!lastName) {
+                showError(errorElement, errorIcon, validIcon, 'Введите фамилию');
+                return false;
+            } else if (lastName.length < 2) {
+                showError(errorElement, errorIcon, validIcon, 'Фамилия должна содержать не менее 2 символов');
+                return false;
+            } else if (!/^[а-яА-ЯёЁ\-]+$/.test(lastName)) {
+                showError(errorElement, errorIcon, validIcon, 'Фамилия может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateFirstName() {
+            const firstName = document.getElementById('first_name').value;
+            const errorElement = document.getElementById('firstNameError');
+            const errorIcon = document.getElementById('firstNameErrorIcon');
+            const validIcon = document.getElementById('firstNameValidIcon');
+
+            if (!fieldInteracted.first_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!firstName) {
+                showError(errorElement, errorIcon, validIcon, 'Введите имя');
+                return false;
+            } else if (firstName.length < 2) {
+                showError(errorElement, errorIcon, validIcon, 'Имя должно содержать не менее 2 символов');
+                return false;
+            } else if (!/^[а-яА-ЯёЁ\-]+$/.test(firstName)) {
+                showError(errorElement, errorIcon, validIcon, 'Имя может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateMiddleName() {
+            const middleName = document.getElementById('middle_name').value;
+            const errorElement = document.getElementById('middleNameError');
+            const errorIcon = document.getElementById('middleNameErrorIcon');
+            const validIcon = document.getElementById('middleNameValidIcon');
+
+            if (!fieldInteracted.middle_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return true; // Необязательное поле
+            }
+
+            if (middleName && !/^[а-яА-ЯёЁ\-]+$/.test(middleName)) {
+                showError(errorElement, errorIcon, validIcon, 'Отчество может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('email').value;
+            const errorElement = document.getElementById('emailError');
+            const errorIcon = document.getElementById('emailErrorIcon');
+            const validIcon = document.getElementById('emailValidIcon');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!fieldInteracted.email) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!email) {
+                showError(errorElement, errorIcon, validIcon, 'Введите email');
+                return false;
+            } else if (!emailRegex.test(email)) {
+                showError(errorElement, errorIcon, validIcon, 'Введите корректный email (например, example@mail.ru)');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateSchoolName() {
+            const schoolName = document.getElementById('school_name').value;
+            const errorElement = document.getElementById('schoolNameError');
+            const errorIcon = document.getElementById('schoolNameErrorIcon');
+            const validIcon = document.getElementById('schoolNameValidIcon');
+
+            if (!fieldInteracted.school_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!schoolName) {
+                showError(errorElement, errorIcon, validIcon, 'Введите название школы');
+                return false;
+            } else if (schoolName.length < 5) {
+                showError(errorElement, errorIcon, validIcon, 'Название школы слишком короткое');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validatePhone() {
+            const phone = document.getElementById('phone').value;
+            const errorElement = document.getElementById('phoneError');
+            const errorIcon = document.getElementById('phoneErrorIcon');
+            const validIcon = document.getElementById('phoneValidIcon');
+            const phoneRegex = /^(\+7|8)[\d\- ]{10,15}$/;
+
+            if (!fieldInteracted.phone) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            const cleanedPhone = phone.replace(/[^\d+]/g, '');
+
+            if (!phone) {
+                showError(errorElement, errorIcon, validIcon, 'Введите номер телефона');
+                return false;
+            } else if (!/^(\+7|8)/.test(cleanedPhone)) {
+                showError(errorElement, errorIcon, validIcon, 'Номер должен начинаться с +7 или 8');
+                return false;
+            } else if (!phoneRegex.test(phone)) {
+                showError(errorElement, errorIcon, validIcon, 'Введите корректный номер телефона (10-15 цифр после +7 или 8)');
+                return false;
+            } else if (cleanedPhone.length < 11) {
+                showError(errorElement, errorIcon, validIcon, 'Номер телефона слишком короткий');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateMentorLastName() {
+            const mentorLastName = document.getElementById('mentor_last_name').value;
+            const errorElement = document.getElementById('mentorLastNameError');
+            const errorIcon = document.getElementById('mentorLastNameErrorIcon');
+            const validIcon = document.getElementById('mentorLastNameValidIcon');
+
+            if (!fieldInteracted.mentor_last_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!mentorLastName) {
+                showError(errorElement, errorIcon, validIcon, 'Введите фамилию наставника');
+                return false;
+            } else if (mentorLastName.length < 2) {
+                showError(errorElement, errorIcon, validIcon, 'Фамилия наставника должна содержать не менее 2 символов');
+                return false;
+            } else if (!/^[а-яА-ЯёЁ\-]+$/.test(mentorLastName)) {
+                showError(errorElement, errorIcon, validIcon, 'Фамилия наставника может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateMentorFirstName() {
+            const mentorFirstName = document.getElementById('mentor_first_name').value;
+            const errorElement = document.getElementById('mentorFirstNameError');
+            const errorIcon = document.getElementById('mentorFirstNameErrorIcon');
+            const validIcon = document.getElementById('mentorFirstNameValidIcon');
+
+            if (!fieldInteracted.mentor_first_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!mentorFirstName) {
+                showError(errorElement, errorIcon, validIcon, 'Введите имя наставника');
+                return false;
+            } else if (mentorFirstName.length < 2) {
+                showError(errorElement, errorIcon, validIcon, 'Имя наставника должно содержать не менее 2 символов');
+                return false;
+            } else if (!/^[а-яА-ЯёЁ\-]+$/.test(mentorFirstName)) {
+                showError(errorElement, errorIcon, validIcon, 'Имя наставника может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateMentorMiddleName() {
+            const mentorMiddleName = document.getElementById('mentor_middle_name').value;
+            const errorElement = document.getElementById('mentorMiddleNameError');
+            const errorIcon = document.getElementById('mentorMiddleNameErrorIcon');
+            const validIcon = document.getElementById('mentorMiddleNameValidIcon');
+
+            if (!fieldInteracted.mentor_middle_name) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return true; // Необязательное поле
+            }
+
+            if (mentorMiddleName && !/^[а-яА-ЯёЁ\-]+$/.test(mentorMiddleName)) {
+                showError(errorElement, errorIcon, validIcon, 'Отчество наставника может содержать только русские буквы и дефис');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function validateMentorPosition() {
+            const mentorPosition = document.getElementById('mentor_position').value;
+            const errorElement = document.getElementById('mentorPositionError');
+            const errorIcon = document.getElementById('mentorPositionErrorIcon');
+            const validIcon = document.getElementById('mentorPositionValidIcon');
+
+            if (!fieldInteracted.mentor_position) {
+                hideValidation(errorElement, errorIcon, validIcon);
+                return false;
+            }
+
+            if (!mentorPosition) {
+                showError(errorElement, errorIcon, validIcon, 'Введите должность наставника');
+                return false;
+            } else if (mentorPosition.length < 5) {
+                showError(errorElement, errorIcon, validIcon, 'Должность наставника слишком короткая');
+                return false;
+            } else {
+                showSuccess(errorElement, errorIcon, validIcon);
+                return true;
+            }
+        }
+
+        function showError(errorElement, errorIcon, validIcon, message) {
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            errorIcon.style.display = 'block';
+            validIcon.style.display = 'none';
+            errorElement.previousElementSibling.querySelector('input, select').classList.add('field-error');
+        }
+
+        function showSuccess(errorElement, errorIcon, validIcon) {
+            errorElement.style.display = 'none';
+            errorIcon.style.display = 'none';
+            validIcon.style.display = 'block';
+            errorElement.previousElementSibling.querySelector('input, select').classList.remove('field-error');
+        }
+
+        function hideValidation(errorElement, errorIcon, validIcon) {
+            errorElement.style.display = 'none';
+            errorIcon.style.display = 'none';
+            validIcon.style.display = 'none';
+            if (errorElement.previousElementSibling) {
+                errorElement.previousElementSibling.querySelector('input, select').classList.remove('field-error');
+            }
+        }
+
+        function validateStep1() {
+            // Сначала проверяем, что все обязательные поля заполнены
+            const allFilled =
+                document.getElementById('last_name').value.trim() !== '' &&
+                document.getElementById('first_name').value.trim() !== '' &&
+                document.getElementById('email').value.trim() !== '' &&
+                document.getElementById('school_name').value.trim() !== '' &&
+                document.getElementById('phone').value.trim() !== '';
+
+            if (!allFilled) {
+                // Помечаем все поля как interacted, чтобы показать ошибки
+                fieldInteracted.last_name = true;
+                fieldInteracted.first_name = true;
+                fieldInteracted.email = true;
+                fieldInteracted.school_name = true;
+                fieldInteracted.phone = true;
+
+                // Вызываем валидацию всех полей
+                validateLastName();
+                validateFirstName();
+                validateEmail();
+                validateSchoolName();
+                validatePhone();
+
+                return;
+            }
+
+            // Если все заполнено, проверяем валидность
+            const isLastNameValid = validateLastName();
+            const isFirstNameValid = validateFirstName();
+            const isMiddleNameValid = validateMiddleName();
+            const isEmailValid = validateEmail();
+            const isSchoolNameValid = validateSchoolName();
+            const isPhoneValid = validatePhone();
+
+            if (isLastNameValid && isFirstNameValid && isMiddleNameValid &&
+                isEmailValid && isSchoolNameValid && isPhoneValid) {
+                nextStep(2);
+            }
+        }
+
+        function validateForm() {
+            const isMentorLastNameValid = validateMentorLastName();
+            const isMentorFirstNameValid = validateMentorFirstName();
+            const isMentorMiddleNameValid = validateMentorMiddleName();
+            const isMentorPositionValid = validateMentorPosition();
+            const isTeamValid = validateTeam();
+            const isDocumentValid = validateDocument();
+            const isTermsChecked = document.getElementById('termsCheck').checked;
+
+            if (!isTermsChecked) {
+                alert('Необходимо согласиться с условиями пользовательского соглашения');
+                return false;
+            }
+
+            return isMentorLastNameValid && isMentorFirstNameValid &&
+                   isMentorMiddleNameValid && isMentorPositionValid &&
+                   isTeamValid && isDocumentValid;
+        }
+
+        function updateButtonState() {
+            // Проверяем, были ли заполнены все обязательные поля первого шага
+            const allRequiredFieldsFilled =
+                document.getElementById('last_name').value.trim() !== '' &&
+                document.getElementById('first_name').value.trim() !== '' &&
+                document.getElementById('email').valuedocument.getElementById('email').value.trim() !== '' &&
+                document.getElementById('school_name').value.trim() !== '' &&
+                document.getElementById('phone').value.trim() !== '';
+
+            // Проверяем валидность всех полей первого шага
+            const step1Valid = validateLastName() &&
+                              validateFirstName() &&
+                              validateMiddleName() &&
+                              validateEmail() &&
+                              validateSchoolName() &&
+                              validatePhone();
+
+            const step1Btn = document.getElementById('step1Btn');
+            if (allRequiredFieldsFilled && step1Valid) {
+                step1Btn.classList.remove('btn-disabled');
+                step1Btn.classList.add('btn-primary');
+                step1Btn.classList.remove('btn-secondary');
+                step1Btn.disabled = false;
+            } else {
+                step1Btn.classList.add('btn-disabled');
+                step1Btn.classList.remove('btn-primary');
+                step1Btn.classList.add('btn-secondary');
+                step1Btn.disabled = true;
+            }
+
+            // Проверяем валидность всех полей второго шага
+            const step2Valid = (!fieldInteracted.mentor_last_name || validateMentorLastName()) &&
+                             (!fieldInteracted.mentor_first_name || validateMentorFirstName()) &&
+                             (!fieldInteracted.mentor_middle_name || validateMentorMiddleName()) &&
+                             (!fieldInteracted.mentor_position || validateMentorPosition()) &&
+                             (!fieldInteracted.team || validateTeam()) &&
+                             (!fieldInteracted.document || validateDocument()) &&
+                             document.getElementById('termsCheck').checked;
+            const submitBtn = document.getElementById('submitBtn');
+            if (step2Valid) {
+                submitBtn.classList.remove('btn-disabled');
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.classList.add('btn-disabled');
+                submitBtn.disabled = true;
+            }
+        }
+
+        function nextStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            updateProgress();
+            updateFormTitle();
+            updateButtonState();
+
+            const agreementSection = document.getElementById('agreementSection');
+            if (step === 2) {
+                setTimeout(() => {
+                    agreementSection.classList.add('show');
+                }, 300);
+            } else {
+                agreementSection.classList.remove('show');
+            }
+        }
+
+        function prevStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            updateProgress();
+            updateFormTitle();
+            updateButtonState();
+
+            const agreementSection = document.getElementById('agreementSection');
+            if (step !== 2) {
+                agreementSection.classList.remove('show');
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function updateFormTitle() {
+            const titles = {
+                1: "Регистрация",
+                2: "Завершение регистрации"
+            };
+            const titleElement = document.getElementById('formTitle');
+            titleElement.textContent = titles[currentStep];
+            titleElement.classList.remove('fade-in');
+            void titleElement.offsetWidth;
+            titleElement.classList.add('fade-in');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateButtonState();
+        });
+    </script>
+</body>
+</html>
