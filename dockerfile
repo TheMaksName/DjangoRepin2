@@ -11,10 +11,10 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
-RUN mkdir -p /app/registration/staticfiles
+
 
 # Сборка статики и запуск
 # Сборка статики
 # RUN python /app/registration/manage.py collectstatic --noinput
 
-CMD ["gunicorn","--pythonpath","registration", "--bind", "0.0.0.0:8000", "registration.wsgi:application"]
+CMD ["gunicorn","--bind", "0.0.0.0:8000", "registration.wsgi:application"]
