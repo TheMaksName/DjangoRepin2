@@ -51,6 +51,6 @@ jobs:
               -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
               -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
               -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-              -v C:\Users\mlebe\Desktop\project_Maksim\registration\staticfiles:/app/registration/staticfiles \
+              
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/my-django-app:latest
