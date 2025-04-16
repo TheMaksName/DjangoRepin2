@@ -138,8 +138,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 #STATIC_URL = '/static/'
-
-CSRF_TRUSTED_ORIGINS = ['https://samlit.net', 'http://95.163.221.227']
+USE_X_FORWARDED_HOST = True
+CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', '95.163.221.227']
 
 
 STATIC_URL = '/django_static/'
