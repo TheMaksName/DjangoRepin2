@@ -45,6 +45,7 @@ jobs:
             # Запускаем контейнер с переменными окружения
             docker run -d \
               --name django-app \
+              --network django-network \
               -p 8000:8000 \
               -e POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
               -e POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
