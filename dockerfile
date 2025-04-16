@@ -12,7 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-
 # Сборка статики и запуск
 # Сборка статики
 #RUN python /app/registration/manage.py collectstatic --noinput
