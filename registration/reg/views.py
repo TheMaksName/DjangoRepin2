@@ -16,4 +16,4 @@ def registration_true(request):
     if request.method != 'POST':
         return HttpResponse("Неверный метод запроса", status=405)
 
-    return HttpResponse(str(request))
+    return HttpResponse(str(request.POST))
