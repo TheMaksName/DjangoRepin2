@@ -17,4 +17,4 @@ COPY . /app/
 # Сборка статики
 RUN python /app/registration/manage.py collectstatic --noinput
 
-CMD ["gunicorn","--pythonpath","registration", "--bind", "0.0.0.0:8000", "registration.wsgi:application"]
+CMD ["gunicorn","--pythonpath","registration", "--bind", "0.0.0.0:8001", "registration.wsgi:application"]
