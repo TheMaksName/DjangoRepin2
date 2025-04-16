@@ -46,6 +46,7 @@ jobs:
             docker run -d \
               --name django-app \
               -p 8000:8000 \
+              -v /var/www/Django-repin :/app/staticfiles django-app \
               -e POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
               -e POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
               -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
