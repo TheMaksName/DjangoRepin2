@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.conf.global_settings import USE_X_FORWARDED_HOST, CSRF_TRUSTED_ORIGINS
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -137,9 +139,14 @@ USE_TZ = True
 
 #STATIC_URL = '/static/'
 
+CSRF_TRUSTED_ORIGINS = ['https://samlit.net', 'http://95.163.221.227']
+
+
 STATIC_URL = '/django_static/'
 STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
 STATICFILES_DIRS = ['/app/registration/reg/static/',]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
