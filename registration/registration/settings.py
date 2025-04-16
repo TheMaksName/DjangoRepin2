@@ -138,7 +138,7 @@ USE_TZ = True
 #STATIC_URL = '/static/'
 
 STATIC_URL = '/django-static/'
-STATIC_ROOT = '/app/'  # Папка, куда собирается статика
+STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
 STATICFILES_DIRS = ['/app/registration/reg/static/',]
 
 # Default primary key field type
