@@ -139,7 +139,7 @@ USE_TZ = True
 
 
 USE_X_FORWARDED_HOST = True
-CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227']
+CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
 
 
 STATIC_URL = '/django_static/'
