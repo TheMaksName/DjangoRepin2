@@ -27,6 +27,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/my-django-app:latest
+          no-cache: true
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
