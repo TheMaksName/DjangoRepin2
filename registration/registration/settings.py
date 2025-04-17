@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 from django.conf.global_settings import USE_X_FORWARDED_HOST, CSRF_TRUSTED_ORIGINS
 
@@ -27,8 +29,8 @@ SECRET_KEY = 'django-insecure-&i1z@+ur)aj*hg+50_#w@=n7v)!iw@&*s2+c%)n^=4zv0a-e^9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "95.163.221.227", '0.0.0.0', "127.0.0.1"]
-
+# ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "95.163.221.227", '0.0.0.0', "127.0.0.1", 'localhost']
+ALLOWED_HOSTS =  []
 
 # Application definition
 
@@ -85,6 +87,14 @@ DATABASES = {
         'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
+print("\n" + "="*50)
+print("Проверка переменных окружения:")
+print(f"DB: {os.getenv('POSTGRES_DB')}")
+print(f"USER: {os.getenv('POSTGRES_USER')}")
+print(f"PASSWORD: {'***' if os.getenv('POSTGRES_PASSWORD') else 'None'}")
+print(f"HOST: {os.getenv('POSTGRES_HOST')}")
+print(f"PORT: {os.getenv('POSTGRES_PORT')}")
+print("="*50 + "\n")
 
 #Настройки почты
 
@@ -137,14 +147,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
-USE_X_FORWARDED_HOST = True
-CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
-
-
 STATIC_URL = '/django_static/'
-STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
-STATICFILES_DIRS = ['/app/registration/reg/static/',]
+
+# USE_X_FORWARDED_HOST = True
+# CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
+#
+#
+# STATIC_URL = '/django_static/'
+# STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
+# STATICFILES_DIRS = ['/app/registration/reg/static/',]
 
 
 

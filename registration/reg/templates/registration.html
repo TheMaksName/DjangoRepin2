@@ -111,9 +111,9 @@
         }
         .file-upload-input {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            height:20px;
             opacity: 0;
+            display:none;
             cursor: pointer;
         }
         .file-upload-label {
@@ -256,21 +256,22 @@
 
                                     <!-- Поле для команды -->
                                     <div class="input-container">
-                                        <select class="form-control" id="team" name="team">
+                                        <select class="form-control" id="team" name="team_select">
                                             <option value="">Выберите команду или введите новую</option>
-                                            {% for team in teams %}
-                                                <option value='{{ team.name }}'>{{ team.name }}</option>
-                                            {% endfor %}
+                                            <option value="team1">Команда Альфа</option>
+                                            <option value="team2">Команда Бета</option>
+                                            <option value="team3">Команда Гамма</option>
                                             <option value="custom">Другая команда</option>
                                         </select>
                                         <input type="text" class="form-control mt-2" id="custom_team" name="custom_team" placeholder="Введите название команды" style="display: none;">
                                         <i class="fas fa-exclamation-circle error-icon" id="teamErrorIcon"></i>
                                         <i class="fas fa-check-circle valid-icon" id="teamValidIcon"></i>
                                     </div>
+                                    <input type="hidden" id="final_team" name="team">
                                     <div class="error" id="teamError"></div>
 
                                     <!-- Поле загрузки файла (перенесено на второй шаг) -->
-                                    <div class="file-upload input-container" style="margin-top: 10px;">
+                                    <div class=" input-container" style="margin-top: 10px;">
                                         <label class="file-upload-label" for="document">
                                             <span class="file-icon"><i class="fas fa-cloud-upload-alt"></i></span>
                                             <span class="file-name" id="fileName">Загрузите документ (PDF, DOC, DOCX, JPG, PNG)</span>
@@ -317,7 +318,7 @@
             </div>
         </div>
     </div>
-
+   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let currentStep = 1;
@@ -351,31 +352,44 @@
         // Обработчик для поля команды
         document.getElementById('team').addEventListener('change', function() {
             const customTeamInput = document.getElementById('custom_team');
+            const finalTeamInput = document.getElementById('final_team');
             fieldInteracted.team = true;
 
             if (this.value === 'custom') {
                 customTeamInput.style.display = 'block';
                 customTeamInput.focus();
+                finalTeamInput.value = '';
             } else {
                 customTeamInput.style.display = 'none';
                 customTeamInput.value = '';
+                finalTeamInput.value = this.value;
             }
 
             validateTeam();
             updateButtonState();
         });
 
+        document.getElementById('custom_team').addEventListener('input', function() {
+            const finalTeamInput = document.getElementById('final_team');
+            fieldInteracted.team = true;
+            finalTeamInput.value = this.value;
+            validateTeam();
+            updateButtonState();
+        });
         // Обработчик для отправки формы
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             const teamSelect = document.getElementById('team');
             const customTeam = document.getElementById('custom_team');
+            const finalTeam = document.getElementById('final_team');
 
             if (teamSelect.value === 'custom') {
-                teamSelect.name = 'team';
-                teamSelect.value = customTeam.value;
-                customTeam.name = '';
+                finalTeam.value = customTeam.value;
             } else {
-                customTeam.name = '';
+                finalTeam.value = teamSelect.value;
+            }
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
             }
         });
 
@@ -410,6 +424,7 @@
         setupFieldValidation('mentor_middle_name', validateMentorMiddleName);
         setupFieldValidation('mentor_position', validateMentorPosition);
         setupFieldValidation('team', validateTeam);
+        setupFieldValidation('custom_team', validateTeam);
 
         // Обработчик для чекбокса
         document.getElementById('termsCheck').addEventListener('change', function() {
@@ -454,41 +469,46 @@
         }
 
         // Функция валидации команды
-        function validateTeam() {
-            const teamSelect = document.getElementById('team').value;
-            const customTeam = document.getElementById('custom_team').value;
-            const errorElement = document.getElementById('teamError');
-            const errorIcon = document.getElementById('teamErrorIcon');
-            const validIcon = document.getElementById('teamValidIcon');
+function validateTeam() {
+    const teamSelect = document.getElementById('team');
+    const customTeamInput = document.getElementById('custom_team');
+    const customTeam = customTeamInput.value.trim();
+    const errorElement = document.getElementById('teamError');
+    const errorIcon = document.getElementById('teamErrorIcon');
+    const validIcon = document.getElementById('teamValidIcon');
 
-            if (!fieldInteracted.team) {
-                hideValidation(errorElement, errorIcon, validIcon);
-                return false;
-            }
+    if (!fieldInteracted.team) {
+        hideValidation(errorElement, errorIcon, validIcon);
+        return false;
+    }
 
-            if (!teamSelect) {
-                showError(errorElement, errorIcon, validIcon, 'Выберите команду или введите новую');
-                return false;
-            }
-
-            if (teamSelect === 'custom' && !customTeam.trim()) {
-                showError(errorElement, errorIcon, validIcon, 'Введите название своей команды');
-                return false;
-            }
-
-            if (teamSelect === 'custom' && customTeam.length < 2) {
-                showError(errorElement, errorIcon, validIcon, 'Название команды должно содержать не менее 2 символов');
-                return false;
-            }
-
-            if (teamSelect === 'custom' && !/^[а-яА-ЯёЁ0-9\s\-]+$/.test(customTeam)) {
-                showError(errorElement, errorIcon, validIcon, 'Название команды может содержать только русские буквы, цифры, пробелы и дефис');
-                return false;
-            }
-
+    // Если выбрана опция "Другая команда"
+    if (teamSelect.value === 'custom') {
+        if (!customTeam) {
+            showError(errorElement, errorIcon, validIcon, 'Введите название своей команды');
+            return false;
+        } else if (customTeam.length < 2) {
+            showError(errorElement, errorIcon, validIcon, 'Название команды должно содержать не менее 2 символов');
+            return false;
+        } else if (!/^[а-яА-ЯёЁ0-9\s\-]+$/.test(customTeam)) {
+            showError(errorElement, errorIcon, validIcon, 'Название команды может содержать только русские буквы, цифры, пробелы и дефис');
+            return false;
+        } else {
             showSuccess(errorElement, errorIcon, validIcon);
             return true;
         }
+    }
+    // Если выбрана команда из списка
+    else if (teamSelect.value) {
+        showSuccess(errorElement, errorIcon, validIcon);
+        return true;
+    }
+    // Если ничего не выбрано
+    else {
+        showError(errorElement, errorIcon, validIcon, 'Выберите команду или введите новую');
+        return false;
+    }
+}
 
         function validateLastName() {
             const lastName = document.getElementById('last_name').value;
