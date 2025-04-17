@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def registration(request):
-    return render(request, 'registration.html')
+    return render(request, 'registration2.html')
 
 def registration_true(request):
     return HttpResponse('Все хорошо')
