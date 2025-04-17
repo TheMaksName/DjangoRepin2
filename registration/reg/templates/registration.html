@@ -871,12 +871,12 @@ function validateTeam() {
             }
 
             // Проверяем валидность всех полей второго шага
-            const step2Valid = (!fieldInteracted.mentor_last_name || validateMentorLastName()) &&
-                             (!fieldInteracted.mentor_first_name || validateMentorFirstName()) &&
-                             (!fieldInteracted.mentor_middle_name || validateMentorMiddleName()) &&
-                             (!fieldInteracted.mentor_position || validateMentorPosition()) &&
-                             (!fieldInteracted.team || validateTeam()) &&
-                             (!fieldInteracted.document || validateDocument()) &&
+            const step2Valid = validateMentorLastName() &&
+                               validateMentorFirstName() &&
+                               validateMentorMiddleName() &&
+                               validateMentorPosition() &&
+                               validateTeam() &&
+                               validateDocument() &&
                              document.getElementById('termsCheck').checked;
             const submitBtn = document.getElementById('submitBtn');
             if (step2Valid) {
