@@ -834,10 +834,18 @@ function validateTeam() {
                 alert('Необходимо согласиться с условиями пользовательского соглашения');
                 return false;
             }
-
-            return isMentorLastNameValid && isMentorFirstNameValid &&
-                   isMentorMiddleNameValid && isMentorPositionValid &&
-                   isTeamValid && isDocumentValid;
+            const allRequiredFieldsFilled = 
+                document.getElementById('mentor_last_name').value.trim() !== '' &&
+                document.getElementById('mentor_first_name').value.trim() !== '' &&
+                document.getElementById('mentor_position').value.trim() !== '' &&
+                (document.getElementById('team').value !== '' || 
+                 (document.getElementById('team').value === 'custom' && 
+                  document.getElementById('custom_team').value.trim() !== '')) &&
+                document.getElementById('document').files.length > 0;
+            // return isMentorLastNameValid && isMentorFirstNameValid &&
+            //        isMentorMiddleNameValid && isMentorPositionValid &&
+            //        isTeamValid && isDocumentValid;
+            return allRequiredFieldsFilled && isTermsChecked;
         }
 
         function updateButtonState() {
@@ -878,8 +886,17 @@ function validateTeam() {
                                validateTeam() &&
                                validateDocument() &&
                              document.getElementById('termsCheck').checked;
+
+            const allRequiredFieldsFilledStep2 = 
+                document.getElementById('mentor_last_name').value.trim() !== '' &&
+                document.getElementById('mentor_first_name').value.trim() !== '' &&
+                document.getElementById('mentor_position').value.trim() !== '' &&
+                (document.getElementById('team').value !== '' || 
+                (document.getElementById('team').value === 'custom' && 
+                document.getElementById('custom_team').value.trim() !== '')) &&
+                document.getElementById('document').files.length > 0;
             const submitBtn = document.getElementById('submitBtn');
-            if (step2Valid) {
+            if (allRequiredFieldsFilledStep2 && isTermsChecked) {
                 submitBtn.classList.remove('btn-disabled');
                 submitBtn.disabled = false;
             } else {
