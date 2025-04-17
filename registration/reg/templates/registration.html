@@ -835,7 +835,16 @@ function validateTeam() {
                               validateSchoolName() &&
                               validatePhone();
             
-            document.getElementById('step1Btn').disabled = !step1Valid;
+            const step1Btn = document.getElementById('step1Btn');
+            if (step1Valid) {
+                step1Btn.classList.remove('btn-disabled');
+                step1Btn.classList.add('btn-primary');
+                step1Btn.disabled = false;
+            } else {
+                step1Btn.classList.add('btn-disabled');
+                step1Btn.classList.remove('btn-primary');
+                step1Btn.disabled = true;
+            }
         
             // Для второго шага делаем простую проверку заполнения
             if (currentStep === 2) {
@@ -849,9 +858,17 @@ function validateTeam() {
                     document.getElementById('document').files.length > 0 &&
                     document.getElementById('termsCheck').checked;
         
-                document.getElementById('submitBtn').disabled = !isFilled;
+                const submitBtn = document.getElementById('submitBtn');
+                if (isFilled) {
+                    submitBtn.classList.remove('btn-disabled');
+                    submitBtn.classList.add('btn-primary');
+                    submitBtn.disabled = false;
+                } else {
+                    submitBtn.classList.add('btn-disabled');
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.disabled = true;
+                }
             }
-            console.log('Updating button state...');
 
             if (currentStep === 2) {
                 console.log('Mentor last name:', document.getElementById('mentor_last_name').value.trim());
