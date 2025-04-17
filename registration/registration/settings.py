@@ -29,8 +29,8 @@ SECRET_KEY = 'django-insecure-&i1z@+ur)aj*hg+50_#w@=n7v)!iw@&*s2+c%)n^=4zv0a-e^9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "95.163.221.227", '0.0.0.0', "127.0.0.1", 'localhost']
-ALLOWED_HOSTS =  []
+ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "95.163.221.227", '0.0.0.0', "127.0.0.1", 'localhost']
+
 
 # Application definition
 
@@ -149,13 +149,12 @@ USE_TZ = True
 
 STATIC_URL = '/django_static/'
 
-# USE_X_FORWARDED_HOST = True
-# CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
-#
-#
-# STATIC_URL = '/django_static/'
-# STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
-# STATICFILES_DIRS = ['/app/registration/reg/static/',]
+USE_X_FORWARDED_HOST = True
+CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
+
+STATIC_URL = '/django_static/'
+STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
+STATICFILES_DIRS = ['/app/registration/reg/static/',]
 
 
 
