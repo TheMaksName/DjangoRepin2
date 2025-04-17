@@ -156,7 +156,7 @@ STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается �
 STATICFILES_DIRS = ['/app/registration/reg/static/',]
 
 MEDIA_URL = '/django_media/'
-MEDIA_ROOT = '/var/www/media/Django-repin/'
+MEDIA_ROOT = '/app/media/'
 
 
 # Default primary key field type
