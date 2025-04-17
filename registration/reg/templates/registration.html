@@ -822,87 +822,47 @@ function validateTeam() {
         }
 
         function validateForm() {
-            const isMentorLastNameValid = validateMentorLastName();
-            const isMentorFirstNameValid = validateMentorFirstName();
-            const isMentorMiddleNameValid = validateMentorMiddleName();
-            const isMentorPositionValid = validateMentorPosition();
-            const isTeamValid = validateTeam();
-            const isDocumentValid = validateDocument();
-            const isTermsChecked = document.getElementById('termsCheck').checked;
-
-            if (!isTermsChecked) {
-                alert('Необходимо согласиться с условиями пользовательского соглашения');
-                return false;
-            }
-            const allRequiredFieldsFilled = 
-                document.getElementById('mentor_last_name').value.trim() !== '' &&
-                document.getElementById('mentor_first_name').value.trim() !== '' &&
-                document.getElementById('mentor_position').value.trim() !== '' &&
-                (document.getElementById('team').value !== '' || 
-                 (document.getElementById('team').value === 'custom' && 
-                  document.getElementById('custom_team').value.trim() !== '')) &&
-                document.getElementById('document').files.length > 0;
-            // return isMentorLastNameValid && isMentorFirstNameValid &&
-            //        isMentorMiddleNameValid && isMentorPositionValid &&
-            //        isTeamValid && isDocumentValid;
-            return allRequiredFieldsFilled && isTermsChecked;
+            updateButtonState(); // Синхронизируем состояние
+            return !document.getElementById('submitBtn').disabled;
         }
 
         function updateButtonState() {
-            // Проверяем, были ли заполнены все обязательные поля первого шага
-            const allRequiredFieldsFilled =
-                document.getElementById('last_name').value.trim() !== '' &&
-                document.getElementById('first_name').value.trim() !== '' &&
-                document.getElementById('email').value.trim() !== '' &&
-                document.getElementById('school_name').value.trim() !== '' &&
-                document.getElementById('phone').value.trim() !== '';
-
-            // Проверяем валидность всех полей первого шага
+            console.log('Updating button state...');
+            // Для первого шага оставляем как было
             const step1Valid = validateLastName() &&
                               validateFirstName() &&
-                              validateMiddleName() &&
                               validateEmail() &&
                               validateSchoolName() &&
                               validatePhone();
+            
+            document.getElementById('step1Btn').disabled = !step1Valid;
+        
+            // Для второго шага делаем простую проверку заполнения
+            if (currentStep === 2) {
+                const isFilled = 
+                    document.getElementById('mentor_last_name').value.trim() !== '' &&
+                    document.getElementById('mentor_first_name').value.trim() !== '' &&
+                    document.getElementById('mentor_position').value.trim() !== '' &&
+                    (document.getElementById('team').value !== '' || 
+                     (document.getElementById('team').value === 'custom' && 
+                      document.getElementById('custom_team').value.trim() !== '')) &&
+                    document.getElementById('document').files.length > 0 &&
+                    document.getElementById('termsCheck').checked;
+        
+                document.getElementById('submitBtn').disabled = !isFilled;
+            }
+            console.log('Updating button state...');
 
-            const step1Btn = document.getElementById('step1Btn');
-            if (allRequiredFieldsFilled && step1Valid) {
-                step1Btn.classList.remove('btn-disabled');
-                step1Btn.classList.add('btn-primary');
-                step1Btn.classList.remove('btn-secondary');
-                step1Btn.disabled = false;
-            } else {
-                step1Btn.classList.add('btn-disabled');
-                step1Btn.classList.remove('btn-primary');
-                step1Btn.classList.add('btn-secondary');
-                step1Btn.disabled = true;
+            if (currentStep === 2) {
+                console.log('Mentor last name:', document.getElementById('mentor_last_name').value.trim());
+                console.log('Mentor first name:', document.getElementById('mentor_first_name').value.trim());
+                console.log('Mentor position:', document.getElementById('mentor_position').value.trim());
+                console.log('Team value:', document.getElementById('team').value);
+                console.log('Custom team:', document.getElementById('custom_team').value.trim());
+                console.log('Document:', document.getElementById('document').files.length);
+                console.log('Terms checked:', document.getElementById('termsCheck').checked);
             }
 
-            // Проверяем валидность всех полей второго шага
-            const step2Valid = validateMentorLastName() &&
-                               validateMentorFirstName() &&
-                               validateMentorMiddleName() &&
-                               validateMentorPosition() &&
-                               validateTeam() &&
-                               validateDocument() &&
-                             document.getElementById('termsCheck').checked;
-
-            const allRequiredFieldsFilledStep2 = 
-                document.getElementById('mentor_last_name').value.trim() !== '' &&
-                document.getElementById('mentor_first_name').value.trim() !== '' &&
-                document.getElementById('mentor_position').value.trim() !== '' &&
-                (document.getElementById('team').value !== '' || 
-                (document.getElementById('team').value === 'custom' && 
-                document.getElementById('custom_team').value.trim() !== '')) &&
-                document.getElementById('document').files.length > 0;
-            const submitBtn = document.getElementById('submitBtn');
-            if (allRequiredFieldsFilledStep2 && isTermsChecked) {
-                submitBtn.classList.remove('btn-disabled');
-                submitBtn.disabled = false;
-            } else {
-                submitBtn.classList.add('btn-disabled');
-                submitBtn.disabled = true;
-            }
         }
 
         function nextStep(step) {
@@ -957,6 +917,13 @@ function validateTeam() {
         document.addEventListener('DOMContentLoaded', function() {
             updateButtonState();
         });
+    document.querySelectorAll('#step2 input, #step2 select, #document').forEach(el => {
+        el.addEventListener('input', updateButtonState);
+        el.addEventListener('change', updateButtonState);
+    });
+    
+    // Проверка при изменении чекбокса
+    document.getElementById('termsCheck').addEventListener('change', updateButtonState);
     </script>
 </body>
 </html>
