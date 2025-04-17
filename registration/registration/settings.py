@@ -147,7 +147,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/django_static/'
 
 USE_X_FORWARDED_HOST = True
 CSRF_TRUSTED_ORIGINS = ['www.samlit.net', 'samlit.net', 'http://95.163.221.227:8080']
@@ -156,6 +155,8 @@ STATIC_URL = '/django_static/'
 STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
 STATICFILES_DIRS = ['/app/registration/reg/static/',]
 
+MEDIA_URL = '/django_media/'
+MEDIA_ROOT = '/var/www/media/Django-repin/'
 
 
 # Default primary key field type
