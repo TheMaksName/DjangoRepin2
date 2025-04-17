@@ -13,7 +13,8 @@ def registration(request):
     return render(request, 'registration.html')
 
 def registration_true(request):
-    return render(request, 'ura.html')
+    return HttpResponse('Все хорошо')
+    # return render(request, 'ura.html')
     # if request.method != 'POST':
     #     return HttpResponse("Неверный метод запроса", status=405)
 
