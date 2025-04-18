@@ -24,7 +24,7 @@ def registration_true(request):
             'first_name': "Имя",
             'email': "Email",
             'school_name': "Название школы",
-            'phone': "Телефон",
+            'mentor_phone': "Телефон",
             'mentor_last_name': "Фамилия наставника",
             'mentor_first_name': "Имя наставника",
             'mentor_position': "Должность наставника"
