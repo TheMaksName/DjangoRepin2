@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-from django.conf.global_settings import USE_X_FORWARDED_HOST, CSRF_TRUSTED_ORIGINS
+from django.conf.global_settings import USE_X_FORWARDED_HOST, CSRF_TRUSTED_ORIGINS, STATIC_ROOT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,7 +135,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -147,16 +147,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
-USE_X_FORWARDED_HOST = True
-CSRF_TRUSTED_ORIGINS = ['http://www.samlit.net', 'http://samlit.net', 'http://95.163.221.227:8080']
-
-STATIC_URL = '/django_static/'
-STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
-STATICFILES_DIRS = ['/app/registration/reg/static/',]
-
-MEDIA_URL = '/django_media/'
-MEDIA_ROOT = '/app/media/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = []
+# USE_X_FORWARDED_HOST = True
+# CSRF_TRUSTED_ORIGINS = ['http://www.samlit.net', 'http://samlit.net', 'http://95.163.221.227:8080']
+#
+# STATIC_URL = '/django_static/'
+# STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
+# STATICFILES_DIRS = ['/app/registration/reg/static/',]
+#
+# MEDIA_URL = '/django_media/'
+# MEDIA_ROOT = '/app/media/'
 
 
 # Default primary key field type

@@ -32,12 +32,16 @@ class Team(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = "Команда"
+        verbose_name_plural = "Команды"
 
-class Participant(models.Model):
-    """Основная модель участника"""
+
+class Mentor(models.Model):
+    """Модель для хранения информации о наставниках"""
     last_name = models.CharField(max_length=100, verbose_name="Фамилия")
     first_name = models.CharField(max_length=100, verbose_name="Имя")
     middle_name = models.CharField(max_length=100, blank=True, verbose_name="Отчество")
+    position = models.CharField(max_length=100, verbose_name="Должность")
 
     phone_regex = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
@@ -47,11 +51,38 @@ class Participant(models.Model):
         max_length=16,
         validators=[phone_regex],
         unique=True,
-        verbose_name="Телефон"
+        verbose_name="Телефон наставника"
     )
 
-    email = models.EmailField(unique=True, verbose_name="Email")
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} ({self.phone})"
+
+    class Meta:
+        verbose_name = "Наставник"
+        verbose_name_plural = "Наставники"
+        indexes = [
+            models.Index(fields=['phone']),
+        ]
+
+
+class Participant(models.Model):
+    """Основная модель участника"""
+    last_name = models.CharField(max_length=100, verbose_name="Фамилия")
+    first_name = models.CharField(max_length=100, verbose_name="Имя")
+    middle_name = models.CharField(max_length=100, blank=True, verbose_name="Отчество")
+
+    email = models.EmailField(unique=True, verbose_name="Email участника")
     school = models.CharField(max_length=200, verbose_name="Школа")
+
+    mentor = models.ForeignKey(
+        Mentor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=False,
+        verbose_name="Наставник"
+    )
+
     team = models.ForeignKey(
         Team,
         on_delete=models.SET_NULL,
@@ -59,11 +90,6 @@ class Participant(models.Model):
         blank=True,
         verbose_name="Команда"
     )
-
-    mentor_last_name = models.CharField(max_length=100, verbose_name="Фамилия наставника")
-    mentor_first_name = models.CharField(max_length=100, verbose_name="Имя наставника")
-    mentor_middle_name = models.CharField(max_length=100, blank=True, verbose_name="Отчество наставника")
-    mentor_position = models.CharField(max_length=100, verbose_name="Должность наставника")
 
     consent_file = models.FileField(upload_to='consents/', verbose_name="Согласие")
     registration_date = models.DateTimeField(auto_now_add=True)
@@ -75,7 +101,6 @@ class Participant(models.Model):
         verbose_name = "Участник"
         verbose_name_plural = "Участники"
         indexes = [
-            models.Index(fields=['phone']),
             models.Index(fields=['email']),
         ]
 
@@ -121,27 +146,6 @@ class UserCode(models.Model):
             models.Index(fields=['telegram_username']),
             models.Index(fields=['is_verified']),
         ]
-
-
-
-
-
-# admin.py
-from django.contrib import admin
-
-
-@admin.register(Participant)
-class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('last_name', 'first_name', 'email', 'phone', 'school')
-    search_fields = ('last_name', 'first_name', 'email', 'phone')
-
-
-@admin.register(UserCode)
-class UserCodeAdmin(admin.ModelAdmin):
-    list_display = ('code', 'participant', 'is_verified', 'telegram_username')
-    list_filter = ('is_verified',)
-    search_fields = ('code', 'participant__last_name', 'telegram_username')
-
 
 
 @receiver(post_save, sender=Participant)

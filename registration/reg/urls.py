@@ -4,5 +4,5 @@ from .views import registration_true, registration
 
 urlpatterns = [
     path('', registration),
-    path('root', registration_true),
+    path('root/', registration_true),
 ]
