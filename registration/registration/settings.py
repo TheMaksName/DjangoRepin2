@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-&i1z@+ur)aj*hg+50_#w@=n7v)!iw@&*s2+c%)n^=4zv0a-e^9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "95.163.221.227", '0.0.0.0', "127.0.0.1", 'localhost']
+ALLOWED_HOSTS = ['www.samlit.net', "samlit.net", "92.242.60.52", '0.0.0.0', "127.0.0.1", 'localhost']
 
 
 # Application definition
