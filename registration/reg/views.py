@@ -1,6 +1,4 @@
-import requests
 from background_task import background
-from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -12,44 +10,25 @@ import logging
 # Настройка логгера для отслеживания отправки писем
 logger = logging.getLogger(__name__)
 
-
-# views.py
-@background(schedule=5)
+@background(schedule=5)  # Отправит через 5 секунд
 def send_registration_email(email, name, code, team_name):
-    try:
-        html_message = render_to_string(
-            'registration_email.html',
-            {
-                'name': name,
-                'code': code,
-                'team_name': team_name,
-                'event_name': "Название Вашего Мероприятия"
-            }
-        )
-
-        # Отправка через API
-        response = requests.post(
-            "https://api.mail.yandex.net/api/v1/messages/send",
-            headers={
-                "Authorization": f"OAuth {settings.YANDEX_OAUTH_TOKEN}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "from_name": "Repin Bot",
-                "from_email": "repin.bot@yandex.ru",
-                "to": [{"email": email}],
-                "subject": "Ваш код для участия",
-                "body": strip_tags(html_message),
-                "html_body": html_message
-            }
-        )
-        response.raise_for_status()
-        logger.info(f"Письмо отправлено через API на {email}")
-
-    except Exception as e:
-        logger.error(f"Ошибка API Яндекс.Почты: {str(e)}", exc_info=True)
-        if not settings.DEBUG:
-            raise
+    html_message = render_to_string(
+        'registration_email.html',
+        {
+            'name': name,
+            'code': code,
+            'team_name': team_name,
+            'event_name': "Название Вашего Мероприятия"
+        }
+    )
+    send_mail(
+        subject="Ваш код для участия",
+        message=strip_tags(html_message),
+        html_message=html_message,
+        from_email="repin.bot@yandex.ru",
+        recipient_list=[email],
+        fail_silently=False,
+    )
 
 def registration(request):
     teams = models.Team.objects.all().order_by('name').values_list('name', flat=True)

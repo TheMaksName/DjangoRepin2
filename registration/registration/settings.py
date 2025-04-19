@@ -106,16 +106,14 @@ print("="*50 + "\n")
 
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.yandex.ru'
-# EMAIL_PORT = 465
-# EMAIL_USE_TLS = False
-# EMAIL_USE_SSL = True
-# EMAIL_HOST_USER = 'repin.bot@yandex.ru'
-# EMAIL_HOST_PASSWORD = 'adyhwwxsydsvqktt'
-# DEFAULT_FROM_EMAIL = 'repin.bot@yandex.ru'
-YANDEX_OAUTH_TOKEN = 'y0__xCll-qCCBi-kzcgof3W7xKVV1Xs5724sOyin3HUmHGeevRZJw'  # Ваш OAuth-токен
-EMAIL_BACKEND = 'reg.email_backend.YandexApiEmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'repin.bot@yandex.ru'
+EMAIL_HOST_PASSWORD = 'adyhwwxsydsvqktt'
+DEFAULT_FROM_EMAIL = 'repin.bot@yandex.ru'
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -150,8 +148,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# STATIC_URL = '/static/'
-# STATICFILES_DIRS = []
+#STATIC_URL = '/static/'
+#STATICFILES_DIRS = []
 USE_X_FORWARDED_HOST = True
 CSRF_TRUSTED_ORIGINS = ['http://repin.samlit.net','http://www.samlit.net', 'http://samlit.net', 'http://92.242.60.52:8080']
 
