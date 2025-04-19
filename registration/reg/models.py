@@ -1,5 +1,6 @@
 # models.py
 import random
+import secrets
 import string
 from django.db import models
 from django.core.validators import RegexValidator
@@ -11,10 +12,11 @@ from django.utils import timezone
 
 def generate_unique_code(length=8):
     """Генерирует уникальный код из букв и цифр"""
-    while True:
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-        if not UserCode.objects.filter(code=code).exists():
-            return code
+    code = secrets.token_hex(length // 2).upper()[:length]
+    while UserCode.objects.filter(code=code).exists():
+        code = secrets.token_hex(length // 2).upper()[:length]
+    return code
+
 
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Название команды")
@@ -113,13 +115,7 @@ class UserCode(models.Model):
         related_name='verification_code',
         verbose_name="Участник"
     )
-    code = models.CharField(
-        max_length=8,
-        unique=True,
-        default=generate_unique_code,
-        editable=False,
-        verbose_name="Код верификации"
-    )
+
     telegram_username = models.CharField(
         max_length=50,
         null=True,
@@ -135,6 +131,13 @@ class UserCode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     verified_at = models.DateTimeField(null=True, blank=True)
 
+
+    code = models.CharField(
+        max_length=8,
+        unique=True,
+        default=generate_unique_code,
+        editable=False,
+    )
     def __str__(self):
         return f"Код {self.code} для {self.participant}"
 
@@ -148,8 +151,8 @@ class UserCode(models.Model):
         ]
 
 
-@receiver(post_save, sender=Participant)
-def create_verification_code(sender, instance, created, **kwargs):
-    """Создает код верификации при регистрации участника"""
-    if created:
-        UserCode.objects.create(participant=instance)
+# @receiver(post_save, sender=Participant)
+# def create_verification_code(sender, instance, created, **kwargs):
+#     """Создает код верификации при регистрации участника"""
+#     if created:
+#         UserCode.objects.create(participant=instance)

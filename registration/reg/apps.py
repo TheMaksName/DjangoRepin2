@@ -6,5 +6,4 @@ class RegConfig(AppConfig):
     name = 'reg'  # Используем только имя приложения без префиксов
 
     def ready(self):
-        # Импортируем сигналы после загрузки приложения
-        from . import signals  # Точка означает текущий каталог (reg)
+        from . import signals
