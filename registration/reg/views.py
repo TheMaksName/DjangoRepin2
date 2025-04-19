@@ -1,34 +1,13 @@
-from background_task import background
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
+from background_task import background
 from . import models
 import logging
 
-# Настройка логгера для отслеживания отправки писем
 logger = logging.getLogger(__name__)
-
-# @background(schedule=5)  # Отправит через 5 секунд
-# def send_registration_email(email, name, code, team_name):
-#     html_message = render_to_string(
-#         'registration_email.html',
-#         {
-#             'name': name,
-#             'code': code,
-#             'team_name': team_name,
-#             'event_name': "Название Вашего Мероприятия"
-#         }
-#     )
-#     send_mail(
-#         subject="Ваш код для участия",
-#         message=strip_tags(html_message),
-#         html_message=html_message,
-#         from_email="repin.bot@yandex.ru",
-#         recipient_list=[email],
-#         fail_silently=False,
-#     )
 
 def registration(request):
     teams = models.Team.objects.all().order_by('name').values_list('name', flat=True)
@@ -36,7 +15,9 @@ def registration(request):
 
 def registration_true(request):
     if request.method != 'POST':
-        return HttpResponse("Неверный метод запроса", status=405)
+        return render(request, 'registration_error.html', {
+            'error_message': "Неверный метод запроса"
+        }, status=405)
 
     try:
         # Валидация обязательных полей
@@ -79,17 +60,27 @@ def registration_true(request):
             errors['consent_file'] = "Необходимо загрузить файл согласия"
 
         if errors:
-            return JsonResponse({'success': False, 'errors': errors}, status=400)
+            return render(request, 'registration_error.html', {
+                'errors': errors,
+                'error_message': "Пожалуйста, исправьте ошибки в форме"
+            }, status=400)
 
         # Проверка уникальности email
         if models.Participant.objects.filter(email=data['email']).exists():
-            return JsonResponse(
-                {'success': False, 'errors': {'email': "Пользователь с таким email уже зарегистрирован"}},
-                status=400
-            )
+            return render(request, 'registration_error.html', {
+                'error_message': "Пользователь с таким email уже зарегистрирован"
+            }, status=400)
 
         # Проверка уникальности телефона наставника
         mentor_phone = data['mentor_phone']
+        if models.Mentor.objects.filter(phone=mentor_phone).exists():
+            mentor = models.Mentor.objects.get(phone=mentor_phone)
+            if (mentor.last_name != data['mentor_last_name'] or
+                mentor.first_name != data['mentor_first_name']):
+                return render(request, 'registration_error.html', {
+                    'error_message': "Наставник с таким номером телефона уже существует, но с другими данными"
+                }, status=400)
+
         mentor, created = models.Mentor.objects.get_or_create(
             phone=mentor_phone,
             defaults={
@@ -121,55 +112,25 @@ def registration_true(request):
 
             logger.info(f"Участник создан: {participant.email}")
 
-            # Если команда новая, связываем ее с создателем
             if created:
                 team.created_by = participant
                 team.save()
 
-            # Код верификации создается автоматически через сигнал
             user_code = models.UserCode.objects.get(participant=participant)
+            logger.info(f"Код создан: {user_code.code}")
 
-            try:
-                user_code = models.UserCode.objects.get(participant=participant)
-                logger.info(f"Код создан: {user_code.code}")
-            except models.UserCode.DoesNotExist:
-                logger.error("Код верификации не был создан!")
-                return JsonResponse(
-                    {'success': False, 'message': "Ошибка при создании кода верификации"},
-                    status=500
-                )
+            return render(request, 'registration_success.html', {
+                'message': f"Регистрация успешна! Ваш код для входа: {user_code.code}",
+            })
 
         except Exception as e:
             logger.error(f"Ошибка создания участника: {str(e)}", exc_info=True)
-            return JsonResponse(
-                {'success': False, 'message': "Ошибка при создании учетной записи"},
-                status=500
-            )
-
-        # Отправка письма с кодом
-        # try:
-        #     send_registration_email(
-        #         participant.email,
-        #         participant.first_name,
-        #         user_code.code,
-        #         team.name
-        #     )
-        #
-        #     logger.info(f"Отправлен код {user_code.code} для {participant.email}")
-        #
-        # except Exception as e:
-        #     logger.error(f"Ошибка отправки письма: {str(e)}", exc_info=True)
-            # Можно добавить повторную попытку через Celery
-
-        # Рендеринг страницы успешной регистрации
-
-        return render(request, 'registration_success.html', {
-            'message': f"Регистрация успешна! Ваш код для вход {user_code.code}",
-        })
+            return render(request, 'registration_error.html', {
+                'error_message': "Ошибка при создании учетной записи"
+            }, status=500)
 
     except Exception as e:
         logger.error(f"Неожиданная ошибка регистрации: {str(e)}", exc_info=True)
-        return JsonResponse(
-            {'success': False, 'message': "Произошла непредвиденная ошибка"},
-            status=500
-        )
+        return render(request, 'registration_error.html', {
+            'error_message': "Произошла непредвиденная ошибка"
+        }, status=500)

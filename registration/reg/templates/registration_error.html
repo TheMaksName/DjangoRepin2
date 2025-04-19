@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ошибка регистрации</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="alert alert-danger">
+            <h4 class="alert-heading">Ошибка регистрации</h4>
+            <p>{{ error_message }}</p>
+            {% if errors %}
+                <ul>
+                    {% for field, error in errors.items %}
+                        <li><strong>{{ field }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <hr>
+            <p class="mb-0">Пожалуйста, вернитесь назад и исправьте ошибки.</p>
+        </div>
+        <a href="/" class="btn btn-primary">Вернуться к форме регистрации</a>
+    </div>
+</body>
+</html>
