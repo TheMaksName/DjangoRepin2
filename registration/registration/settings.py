@@ -151,7 +151,7 @@ USE_TZ = True
 #STATIC_URL = '/static/'
 #STATICFILES_DIRS = []
 USE_X_FORWARDED_HOST = True
-CSRF_TRUSTED_ORIGINS = ['http://repin.samlit.net','http://www.samlit.net', 'http://samlit.net', 'http://92.242.60.52:8080']
+CSRF_TRUSTED_ORIGINS = ['https://repin.samlit.net','https://www.samlit.net', 'https://samlit.net', 'http://92.242.60.52:8080']
 
 STATIC_URL = '/django_static/'
 STATIC_ROOT = '/app/staticfiles/'  # Папка, куда собирается статика
