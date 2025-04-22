@@ -24,7 +24,7 @@ class Team(models.Model):
     work_theme = models.CharField(
         max_length=255,
         verbose_name="Тема работы",
-        help_text="Укажите тему работы вашей команды"
+        help_text="Укажите тему работы вашей команды",
         default=""  # Или любое другое значение по умолчанию
     )
     
