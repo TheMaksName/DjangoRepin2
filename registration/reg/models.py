@@ -20,6 +20,22 @@ def generate_unique_code(length=8):
 
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Название команды")
+
+    work_theme = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Тема работы",
+        help_text="Укажите тему работы вашей команды"
+    )
+    work_link = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name="Ссылка на работу",
+        help_text="Укажите ссылку на работу (если есть)"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         'Participant',
