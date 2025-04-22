@@ -23,17 +23,16 @@ class Team(models.Model):
 
     work_theme = models.CharField(
         max_length=255,
-        blank=True,
-        null=True,
         verbose_name="Тема работы",
         help_text="Укажите тему работы вашей команды"
+        default=""  # Или любое другое значение по умолчанию
     )
+    
     work_link = models.URLField(
-        max_length=500,
-        blank=True,
-        null=True,
-        verbose_name="Ссылка на работу",
-        help_text="Укажите ссылку на работу (если есть)"
+    max_length=500,
+    verbose_name="Ссылка на работу",
+    help_text="Укажите ссылку на работу (если есть)",
+    default=""  # Или любое другое значение по умолчанию
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
